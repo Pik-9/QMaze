@@ -10,7 +10,7 @@ class Maze;
 class QPainter;
 class QPaintEvent;
 
-class QMemory : public QMainWindow
+class QMazeWindow : public QMainWindow
 {
   Q_OBJECT
 private:
@@ -19,8 +19,8 @@ private:
   bool fullMaze;
 
 public:
-  QMemory ();
-  virtual ~QMemory ();
+  QMazeWindow ();
+  virtual ~QMazeWindow ();
   
   void drawMaze (Maze*, QPainter*);
   void drawCell (Maze*, QPainter*);

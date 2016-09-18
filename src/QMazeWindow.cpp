@@ -1,4 +1,4 @@
-#include "QMemory.hpp"
+#include "QMazeWindow.hpp"
 #include "maze.hpp"
 
 #include <QApplication>
@@ -6,7 +6,7 @@
 #include <QPaintEvent>
 #include <QKeyEvent>
 
-QMemory::QMemory ()
+QMazeWindow::QMazeWindow ()
   : QMainWindow ()
 {
   fullMaze = false;
@@ -15,12 +15,12 @@ QMemory::QMemory ()
   showFullScreen ();
 }
 
-QMemory::~QMemory ()
+QMazeWindow::~QMazeWindow ()
 {
   delete the_maze;
 }
 
-void QMemory::drawMaze (Maze *maze, QPainter *painter)
+void QMazeWindow::drawMaze (Maze *maze, QPainter *painter)
 {
   QRect cells[maze->get_x ()][maze->get_y ()];
   const int wd = width () / maze->get_x ();
@@ -67,7 +67,7 @@ void QMemory::drawMaze (Maze *maze, QPainter *painter)
   painter->fillPath (path, Qt::green);
 }
 
-void QMemory::drawCell (Maze *maze, QPainter *painter)
+void QMazeWindow::drawCell (Maze *maze, QPainter *painter)
 {
   QRect corners[3][3];
   const int wd = width () / 3;
@@ -127,7 +127,7 @@ void QMemory::drawCell (Maze *maze, QPainter *painter)
   }
 }
 
-bool QMemory::move (int direction)
+bool QMazeWindow::move (int direction)
 {
   bool RET = false;
   Direction dir = (Direction) direction;
@@ -167,7 +167,7 @@ bool QMemory::move (int direction)
   return RET;
 }
 
-void QMemory::keyPressEvent (QKeyEvent *event)
+void QMazeWindow::keyPressEvent (QKeyEvent *event)
 {
   CellID pos;
   pos.id = myPosition;
@@ -219,7 +219,7 @@ void QMemory::keyPressEvent (QKeyEvent *event)
   }
 }
 
-void QMemory::paintEvent (QPaintEvent *event)
+void QMazeWindow::paintEvent (QPaintEvent *event)
 {
   QWidget::paintEvent (event);
   QPainter pnt (this);

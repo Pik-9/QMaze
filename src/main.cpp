@@ -1,11 +1,11 @@
 #include <QApplication>
 
-#include "QMemory.hpp"
+#include "QMazeWindow.hpp"
 
 
 int main (int argc, char *argv[])
 {
   QApplication app (argc, argv);
-  QMemory *qmemory = new QMemory ();
+  QMazeWindow *mwin = new QMazeWindow ();
   return app.exec ();
 }
