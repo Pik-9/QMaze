@@ -1,13 +1,16 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8.11)
 project(qmemory)
-find_package(Qt4 REQUIRED)
 
-include_directories(${QT_INCLUDES} ${CMAKE_CURRENT_BINARY_DIR})
+find_package(Qt5Widgets REQUIRED)
+set(QMemory_SRCS
+  src/QMemory.cpp
+  src/main.cpp
+)
 
-set(QMemory_SRCS QMemory.cpp main.cpp)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-qt4_automoc(${QMemory_SRCS})
-add_executable(qmemory ${QMemory_SRCS})
-target_link_libraries(qmemory ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY})
+add_executable(${PROJECT_NAME} ${QMemory_SRCS})
+target_link_libraries(${PROJECT_NAME} Qt5::Widgets)
 
 install(TARGETS qmemory RUNTIME DESTINATION bin)
