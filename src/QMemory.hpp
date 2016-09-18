@@ -4,6 +4,9 @@
 #include <QMainWindow>
 
 class QKeyEvent;
+class Maze;
+class QPainter;
+class QPaintEvent;
 
 class QMemory : public QMainWindow
 {
@@ -12,8 +15,11 @@ public:
   QMemory ();
   virtual ~QMemory ();
   
+  void drawMaze (Maze*, QPainter*);
+  
 protected:
   void keyPressEvent (QKeyEvent*);
+  void paintEvent (QPaintEvent*);
 };
 
 #endif // QMemory_H

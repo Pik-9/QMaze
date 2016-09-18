@@ -4,6 +4,8 @@ project(qmemory)
 find_package(Qt5Widgets REQUIRED)
 set(QMemory_SRCS
   src/QMemory.cpp
+  src/maze.cpp
+  src/random.cpp
   src/main.cpp
 )
 
