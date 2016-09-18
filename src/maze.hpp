@@ -16,10 +16,10 @@ union CellID
 };
 
 enum Direction  {
-  D_TOP = 0,
-  D_BOTTOM = 1,
-  D_RIGHT = 2,
-  D_LEFT = 3
+  D_TOP = 1,
+  D_BOTTOM = 2,
+  D_RIGHT = 4,
+  D_LEFT = 8
 };
 
 struct Cell
@@ -33,6 +33,7 @@ struct Cell
   
   void setWall (Direction);
   void unsetWall (Direction);
+  bool isWallSet (Direction);
 };
 
 class ECellOutOfMaze : public std::exception {};
@@ -47,6 +48,9 @@ private:
 public:
   Maze (const uint16_t, const uint16_t);
   virtual ~Maze ();
+  
+  void refresh ();
+  bool canGo (const CellID, const Direction);
   
   uint16_t get_x () const;
   uint16_t get_y () const;

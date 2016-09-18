@@ -10,11 +10,15 @@
 QMemory::QMemory ()
   : QMainWindow ()
 {
+  maze = new Maze (11, 7);
+  myPosition = maze->getStart ().id;
   showFullScreen ();
 }
 
 QMemory::~QMemory ()
-{}
+{
+  delete maze;
+}
 
 void QMemory::drawMaze (Maze *maze, QPainter *painter)
 {
@@ -28,47 +32,131 @@ void QMemory::drawMaze (Maze *maze, QPainter *painter)
   for (int ix = 0; ix < maze->get_x (); ++ix)  {
     for (int iy = 0; iy < maze->get_y (); ++iy)  {
       cells[ix][iy] = QRect (wd * ix, ht * iy, wd, ht);
+      Cell& cll = maze->cellAt (ix + 1, iy + 1);
       
-      int walls = maze->cellAt (ix + 1, iy + 1).walls;
-      QString dbg_msg = QString ("c(%1, %2) = %3").arg (ix).arg (iy).arg (walls);
-      CellID ii;
-      ii.coord.x = ix + 1;
-      ii.coord.y = iy + 1;
-      if (ii.id == maze->getStart ().id)  {
-        dbg_msg += " (Start)";
+      if (cll.id.id == maze->getStart ().id)  {
+        painter->drawText (QPointF (cells[ix][iy].center ()), tr ("Start"));
       }
-      if (ii.id == maze->getFinish ().id)  {
-        dbg_msg += " (Finish)";
+      if (cll.id.id == maze->getFinish ().id)  {
+        painter->drawText (QPointF (cells[ix][iy].center ()), tr ("Finish"));
       }
-      if (walls & (1 << D_BOTTOM))  {
-        painter->drawLine (cells[ix][iy].bottomLeft (), cells[ix][iy].bottomRight ());
-      }
-      if (walls & (1 << D_TOP))  {
+      
+      if (cll.isWallSet (D_BOTTOM))  {
         painter->drawLine (cells[ix][iy].topLeft (), cells[ix][iy].topRight ());
       }
-      if (walls & (1 << D_RIGHT))  {
+      if (cll.isWallSet (D_TOP))  {
+        painter->drawLine (cells[ix][iy].bottomLeft (), cells[ix][iy].bottomRight ());
+      }
+      if (cll.isWallSet (D_RIGHT))  {
         painter->drawLine (cells[ix][iy].bottomRight (), cells[ix][iy].topRight ());
       }
-      if (walls & (1 << D_LEFT))  {
+      if (cll.isWallSet (D_LEFT))  {
         painter->drawLine (cells[ix][iy].bottomLeft (), cells[ix][iy].topLeft ());
       }
-      painter->drawText (QPointF (cells[ix][iy].center ()), dbg_msg);
     }
   }
+  
+  QPainterPath path;
+  QRectF bounding;
+  CellID pos;
+  pos.id = myPosition;
+  bounding.setWidth (0.6 * wd);
+  bounding.setHeight (0.6 * ht);
+  bounding.moveCenter (cells[pos.coord.x - 1][pos.coord.y - 1].center ());
+  path.addEllipse (bounding);
+  painter->fillPath (path, Qt::green);
+}
+
+bool QMemory::move (int direction)
+{
+  bool RET = false;
+  Direction dir = (Direction) direction;
+  CellID pos;
+  pos.id = myPosition;
+  
+  Cell& cll = maze->cellAt (pos);
+  qDebug () << "Move: (" << pos.coord.x << "|" << cll.id.coord.x << ", " << pos.coord.y << "|" << cll.id.coord.y << ") -> " << direction << " ** " << cll.walls;
+  
+  if (maze->canGo (pos, dir))  {
+    RET = true;
+    switch (dir)  {
+      case D_TOP:  {
+        pos.coord.y++;
+        myPosition = pos.id;
+        break;
+      }
+      
+      case D_RIGHT:  {
+        pos.coord.x++;
+        myPosition = pos.id;
+        break;
+      }
+      
+      case D_BOTTOM:  {
+        pos.coord.y--;
+        myPosition = pos.id;
+        break;
+      }
+      
+      case D_LEFT:  {
+        pos.coord.x--;
+        myPosition = pos.id;
+        break;
+      }
+    }
+  }
+  repaint ();
+  
+  return RET;
 }
 
 void QMemory::keyPressEvent (QKeyEvent *event)
 {
   qDebug () << event->key ();
-  qApp->quit ();
+  CellID pos;
+  pos.id = myPosition;
+  int kk = event->key ();
+  switch (kk)  {
+    /* Pressed [Esc]: */
+    case 16777216:  {
+      qApp->quit ();
+      break;
+    }
+    
+    /* Pressed [Up] - Pretend to be [Down]: */
+    case 16777235:  {
+      qDebug () << "Pressed [Up]";
+      move ((int) D_BOTTOM);
+      break;
+    }
+    
+    /* Pressed [Down] - Pretend to be [Up]. */
+    case 16777237:  {
+      qDebug () << "Pressed [Down]";
+      move ((int) D_TOP);
+      break;
+    }
+    
+    /* Pressed [Right]. */
+    case 16777236:  {
+      qDebug () << "Pressed [Right]";
+      move ((int) D_RIGHT);
+      break;
+    }
+    
+    /* Pressed [Left]. */
+    case 16777234:  {
+      qDebug () << "Pressed [Left]";
+      move ((int) D_LEFT);
+      break;
+    }
+  }
 }
 
 void QMemory::paintEvent (QPaintEvent *event)
 {
   QWidget::paintEvent (event);
   QPainter pnt (this);
-  Maze mz (10, 10);
-  mz.generate ();
-  drawMaze (&mz, &pnt);
+  drawMaze (maze, &pnt);
   pnt.end ();
 }

@@ -15,29 +15,66 @@ bool Cell::visited ()
 
 void Cell::setWall (Direction dir)
 {
-  walls |= (1 << (int) dir);
+  walls |= (uint8_t) dir;
 }
 
 void Cell::unsetWall (Direction dir)
 {
-  walls &= ~(1 << (int) dir);
+  walls &= ~((int) dir);
+}
+
+bool Cell::isWallSet (Direction dir)
+{
+  uint8_t shift = ((int) dir);
+  bool RET = (walls & dir);
+  return RET;
 }
 
 Maze::Maze (const uint16_t x, const uint16_t y)
   : x_cells (x), y_cells (y)
 {
   cells = new Cell[x * y];
+  uint8_t color = 0;
   for (uint16_t ix = 1; ix <= x; ++ix)  {
     for (uint16_t iy = 1; iy <= y; ++iy)  {
       cellAt (ix, iy).id.coord.x = ix;
       cellAt (ix, iy).id.coord.y = iy;
+      cellAt (ix, iy).walls |= ((color++ % 6) << 5);
     }
   }
+  
+  generate ();
 }
 
 Maze::~Maze ()
 {
   delete[] cells;
+}
+
+void Maze::refresh ()
+{
+  
+}
+
+bool Maze::canGo (const CellID field, const Direction dir)
+{
+  if ((dir == D_TOP)  && (field.coord.y >= y_cells))  {
+    return false;
+  }
+  
+  if ((dir == D_RIGHT)  && (field.coord.x >= x_cells))  {
+    return false;
+  }
+  
+  if ((dir == D_BOTTOM)  && (field.coord.y == 0))  {
+    return false;
+  }
+  
+  if ((dir == D_LEFT)  && (field.coord.x == 0))  {
+    return false;
+  }
+  
+  return (!cellAt (field).isWallSet (dir));
 }
 
 uint16_t Maze::get_x () const
@@ -91,11 +128,11 @@ void Maze::connectCells (CellID a, CellID b)
   int32_t diff_y = a.coord.y - b.coord.y;
   
   if ((diff_x == 0) && (diff_y == 1))  {
-    cellAt (b).unsetWall (D_BOTTOM);
-    cellAt (a).unsetWall (D_TOP);
-  } else if ((diff_x == 0) && (diff_y == -1))  {
-    cellAt (b).unsetWall (D_TOP);
     cellAt (a).unsetWall (D_BOTTOM);
+    cellAt (b).unsetWall (D_TOP);
+  } else if ((diff_x == 0) && (diff_y == -1))  {
+    cellAt (a).unsetWall (D_TOP);
+    cellAt (b).unsetWall (D_BOTTOM);
   } else if ((diff_x == 1) && (diff_y == 0))  {
     cellAt (a).unsetWall (D_LEFT);
     cellAt (b).unsetWall (D_RIGHT);
