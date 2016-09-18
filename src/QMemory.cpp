@@ -5,19 +5,19 @@
 #include <QPainter>
 #include <QPaintEvent>
 #include <QKeyEvent>
-#include <QDebug>
 
 QMemory::QMemory ()
   : QMainWindow ()
 {
-  maze = new Maze (11, 7);
-  myPosition = maze->getStart ().id;
+  fullMaze = false;
+  the_maze = new Maze (11, 7);
+  myPosition = the_maze->getStart ().id;
   showFullScreen ();
 }
 
 QMemory::~QMemory ()
 {
-  delete maze;
+  delete the_maze;
 }
 
 void QMemory::drawMaze (Maze *maze, QPainter *painter)
@@ -67,6 +67,66 @@ void QMemory::drawMaze (Maze *maze, QPainter *painter)
   painter->fillPath (path, Qt::green);
 }
 
+void QMemory::drawCell (Maze *maze, QPainter *painter)
+{
+  QRect corners[3][3];
+  const int wd = width () / 3;
+  const int ht = height () / 3;
+  
+  painter->fillRect (rect (), Qt::black);
+  
+  QColor colors[8] = {
+    Qt::red,
+    Qt::magenta,
+    Qt::blue,
+    Qt::cyan,
+    Qt::green,
+    Qt::yellow,
+    Qt::white,
+    Qt::white
+  };
+  
+  CellID pos;
+  pos.id = myPosition;
+  QColor col = colors[maze->cellAt (pos).walls >> 5];
+  
+  for (int ix = 0; ix < 3; ++ix)  {
+    for (int iy = 0; iy < 3; ++iy)  {
+      corners[ix][iy] = QRect (wd * ix, ht * iy, wd, ht);
+    }
+  }
+  
+  painter->fillRect (corners[0][0], col);
+  painter->fillRect (corners[0][2], col);
+  painter->fillRect (corners[2][0], col);
+  painter->fillRect (corners[2][2], col);
+  
+  if (maze->cellAt (pos).isWallSet (D_RIGHT))  {
+    painter->fillRect (corners[2][1], col);
+  }
+  
+  if (maze->cellAt (pos).isWallSet (D_LEFT))  {
+    painter->fillRect (corners[0][1], col);
+  }
+  
+  if (maze->cellAt (pos).isWallSet (D_TOP))  {
+    painter->fillRect (corners[1][2], col);
+  }
+  
+  if (maze->cellAt (pos).isWallSet (D_BOTTOM))  {
+    painter->fillRect (corners[1][0], col);
+  }
+  
+  painter->setPen (col);
+  if (myPosition == maze->getStart ().id)  {
+    painter->drawText (QPointF (corners[1][1].center ()), tr ("Start"));
+  }
+  
+  if (myPosition == maze->getFinish ().id)  {
+    painter->drawText (QPointF (corners[1][1].center ()), tr ("Finish"));
+  }
+}
+
 bool QMemory::move (int direction)
 {
   bool RET = false;
@@ -74,10 +134,7 @@ bool QMemory::move (int direction)
   CellID pos;
   pos.id = myPosition;
   
-  Cell& cll = maze->cellAt (pos);
-  qDebug () << "Move: (" << pos.coord.x << "|" << cll.id.coord.x << ", " << pos.coord.y << "|" << cll.id.coord.y << ") -> " << direction << " ** " << cll.walls;
-  
-  if (maze->canGo (pos, dir))  {
+  if (the_maze->canGo (pos, dir))  {
     RET = true;
     switch (dir)  {
       case D_TOP:  {
@@ -112,7 +169,6 @@ bool QMemory::move (int direction)
 
 void QMemory::keyPressEvent (QKeyEvent *event)
 {
-  qDebug () << event->key ();
   CellID pos;
   pos.id = myPosition;
   int kk = event->key ();
@@ -125,29 +181,39 @@ void QMemory::keyPressEvent (QKeyEvent *event)
     
     /* Pressed [Up] - Pretend to be [Down]: */
     case 16777235:  {
-      qDebug () << "Pressed [Up]";
       move ((int) D_BOTTOM);
       break;
     }
     
     /* Pressed [Down] - Pretend to be [Up]. */
     case 16777237:  {
-      qDebug () << "Pressed [Down]";
       move ((int) D_TOP);
       break;
     }
     
     /* Pressed [Right]. */
     case 16777236:  {
-      qDebug () << "Pressed [Right]";
       move ((int) D_RIGHT);
       break;
     }
     
     /* Pressed [Left]. */
     case 16777234:  {
-      qDebug () << "Pressed [Left]";
       move ((int) D_LEFT);
+      break;
+    }
+    
+    /* Pressed [F]. */
+    case 70:  {
+      fullMaze = true;
+      repaint ();
+      break;
+    }
+    
+    /* Pressed [C]. */
+    case 67:  {
+      fullMaze = false;
+      repaint ();
       break;
     }
   }
@@ -157,6 +223,10 @@ void QMemory::paintEvent (QPaintEvent *event)
 {
   QWidget::paintEvent (event);
   QPainter pnt (this);
-  drawMaze (maze, &pnt);
+  if (fullMaze)  {
+    drawMaze (the_maze, &pnt);
+  } else  {
+    drawCell (the_maze, &pnt);
+  }
   pnt.end ();
 }

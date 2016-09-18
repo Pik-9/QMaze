@@ -14,14 +14,16 @@ class QMemory : public QMainWindow
 {
   Q_OBJECT
 private:
-  Maze *maze;
+  Maze *the_maze;
   uint32_t myPosition;
+  bool fullMaze;
 
 public:
   QMemory ();
   virtual ~QMemory ();
   
   void drawMaze (Maze*, QPainter*);
+  void drawCell (Maze*, QPainter*);
   bool move (int);
   
 protected:
