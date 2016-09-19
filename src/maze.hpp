@@ -45,11 +45,19 @@ private:
   Cell *cells;
   CellID start, finish;
   
+protected:
+  void refresh ();
+  
+  uint32_t countUnvisited ();
+  void connectCells (CellID, CellID);
+  std::vector<CellID> getUnvisitedNeighbors (CellID);
+  
+  void generate ();
+  
 public:
   Maze (const uint16_t, const uint16_t);
   virtual ~Maze ();
   
-  void refresh ();
   bool canGo (const CellID, const Direction);
   
   uint16_t get_x () const;
@@ -59,12 +67,6 @@ public:
   
   Cell& cellAt (const uint16_t, const uint16_t);
   Cell& cellAt (const CellID);
-  
-  uint32_t countUnvisited ();
-  void connectCells (CellID, CellID);
-  std::vector<CellID> getUnvisitedNeighbors (CellID);
-  
-  void generate ();
 };
 
 #endif

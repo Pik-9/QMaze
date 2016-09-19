@@ -6,11 +6,14 @@
 #include <QPaintEvent>
 #include <QKeyEvent>
 
+const uint32_t QMazeWindow::level[6] = {5, 7, 11, 13, 17, 23};
+
 QMazeWindow::QMazeWindow ()
   : QMainWindow ()
 {
   fullMaze = false;
-  the_maze = new Maze (11, 7);
+  myLevel = 1;
+  the_maze = new Maze (level[myLevel], level[myLevel - 1]);
   myPosition = the_maze->getStart ().id;
   showFullScreen ();
 }
@@ -35,10 +38,10 @@ void QMazeWindow::drawMaze (Maze *maze, QPainter *painter)
       Cell& cll = maze->cellAt (ix + 1, iy + 1);
       
       if (cll.id.id == maze->getStart ().id)  {
-        painter->drawText (QPointF (cells[ix][iy].center ()), tr ("Start"));
+        painter->drawText (cells[ix][iy], Qt::AlignCenter, tr ("Start"));
       }
       if (cll.id.id == maze->getFinish ().id)  {
-        painter->drawText (QPointF (cells[ix][iy].center ()), tr ("Finish"));
+        painter->drawText (cells[ix][iy], Qt::AlignCenter, tr ("Finish"));
       }
       
       if (cll.isWallSet (D_BOTTOM))  {
@@ -119,11 +122,11 @@ void QMazeWindow::drawCell (Maze *maze, QPainter *painter)
   
   painter->setPen (col);
   if (myPosition == maze->getStart ().id)  {
-    painter->drawText (QPointF (corners[1][1].center ()), tr ("Start"));
+    painter->drawText (corners[1][1], Qt::AlignCenter, tr ("Start"));
   }
   
   if (myPosition == maze->getFinish ().id)  {
-    painter->drawText (QPointF (corners[1][1].center ()), tr ("Finish"));
+    painter->drawText (corners[1][1], Qt::AlignCenter, tr ("Finish - Press [Enter] to get to the next level!"));
   }
 }
 
@@ -214,6 +217,20 @@ void QMazeWindow::keyPressEvent (QKeyEvent *event)
     case 67:  {
       fullMaze = false;
       repaint ();
+      break;
+    }
+    
+    /* Pressed [Enter]. */
+    case 16777220:  {
+      if (myPosition == the_maze->getFinish ().id)  {
+        delete the_maze;
+        if (myLevel < 5)  {
+          myLevel++;
+        }
+        the_maze = new Maze (level[myLevel], level[myLevel - 1]);
+        myPosition = the_maze->getStart ().id;
+        repaint ();
+      }
       break;
     }
   }

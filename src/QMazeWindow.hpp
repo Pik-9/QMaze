@@ -15,8 +15,10 @@ class QMazeWindow : public QMainWindow
   Q_OBJECT
 private:
   Maze *the_maze;
-  uint32_t myPosition;
+  uint32_t myPosition, myLevel;
   bool fullMaze;
+  
+  const static uint32_t level[6];
 
 public:
   QMazeWindow ();
@@ -31,4 +33,4 @@ protected:
   void paintEvent (QPaintEvent*);
 };
 
-#endif // QMemory_H
+#endif
