@@ -1,4 +1,4 @@
 [Project]
-Name=QMemory
+Name=QMaze
 Manager=KDevCMakeManager
 VersionControl=kdevgit
