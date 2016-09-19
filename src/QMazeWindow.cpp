@@ -6,13 +6,16 @@
 #include <QPaintEvent>
 #include <QKeyEvent>
 
-const uint32_t QMazeWindow::level[6] = {5, 7, 11, 13, 17, 23};
+const uint32_t QMazeWindow::level[COUNT_LEVEL] = {5, 7, 11, 13, 17, 23, 27};
 
 QMazeWindow::QMazeWindow ()
   : QMainWindow ()
 {
+  setCursor (Qt::BlankCursor);
   fullMaze = false;
   myLevel = 1;
+  complMazes = 0;
+  cameFrom = 16;
   the_maze = new Maze (level[myLevel], level[myLevel - 1]);
   myPosition = the_maze->getStart ().id;
   showFullScreen ();
@@ -37,13 +40,19 @@ void QMazeWindow::drawMaze (Maze *maze, QPainter *painter)
       cells[ix][iy] = QRect (wd * ix, ht * iy, wd, ht);
       Cell& cll = maze->cellAt (ix + 1, iy + 1);
       
+      QFont textFont = painter->font ();
+      textFont.setPointSize (30);
+      painter->setFont (textFont);
       if (cll.id.id == maze->getStart ().id)  {
+        painter->setPen (QColor (0, 128, 255));
         painter->drawText (cells[ix][iy], Qt::AlignCenter, tr ("Start"));
       }
       if (cll.id.id == maze->getFinish ().id)  {
+        painter->setPen (QColor (255, 128, 0));
         painter->drawText (cells[ix][iy], Qt::AlignCenter, tr ("Finish"));
       }
       
+      painter->setPen (Qt::white);
       if (cll.isWallSet (D_BOTTOM))  {
         painter->drawLine (cells[ix][iy].topLeft (), cells[ix][iy].topRight ());
       }
@@ -128,6 +137,111 @@ void QMazeWindow::drawCell (Maze *maze, QPainter *painter)
   if (myPosition == maze->getFinish ().id)  {
     painter->drawText (corners[1][1], Qt::AlignCenter, tr ("Finish - Press [Enter] to get to the next level!"));
   }
+  
+  /* Draw info box. */
+  QRect infoBox;
+  infoBox.setWidth (210);
+  infoBox.setHeight (260);
+  infoBox.moveTopRight (rect ().topRight ());
+  QPen infoBoxStyle (Qt::white, 2, Qt::DashDotLine);
+  painter->fillRect (infoBox, Qt::black);
+  QPoint ctr = infoBox.center ();
+  infoBox.setWidth (200);
+  infoBox.setHeight (250);
+  infoBox.moveCenter (ctr);
+  painter->setPen (infoBoxStyle);
+  painter->drawRect (infoBox);
+  
+  QRect infoText = QRect (0, 0, infoBox.width () - 10, 50);
+  infoText.moveTopRight (infoBox.topRight ());
+  painter->drawText (infoText, Qt::AlignLeft, tr ("Level: %1").arg (myLevel));
+  infoText.moveTop (infoText.bottom ());
+  painter->drawText (infoText, Qt::AlignLeft, tr ("%1 mazes completed").arg (complMazes));
+  infoText.moveTop (infoText.bottom ());
+  painter->drawText (infoText, Qt::AlignLeft, tr ("[Esc]: Quit application"));
+  infoText.moveTop (infoText.bottom ());
+  painter->drawText (infoText, Qt::AlignLeft, tr ("[F]: Show maze map"));
+  infoText.moveTop (infoText.bottom ());
+  painter->drawText (infoText, Qt::AlignLeft, tr ("[C]: Show current cell"));  
+  
+  
+  /* Draw arrow. */
+  QPen arrow_style (Qt::white, 5);
+  painter->setPen (arrow_style);
+  Direction dir = (Direction) cameFrom;
+  switch (dir)  {
+    case D_TOP:  {
+      QPoint outer = QPoint (corners[1][2].center ().x (), corners[1][2].bottom ());
+      painter->drawLine (outer, corners[1][2].center ());
+      QPainterPath arrowPointPath;
+      QPolygonF arrowPoint;
+      QPointF tri = corners[1][2].center ();
+      tri.rx () += 10;
+      arrowPoint << tri;
+      tri.rx () -= 20;
+      arrowPoint << tri;
+      tri.rx () += 10;
+      tri.ry () -= 17;
+      arrowPoint << tri;
+      arrowPointPath.addPolygon (arrowPoint);
+      painter->fillPath (arrowPointPath, Qt::white);
+      break;
+    }
+    
+    case D_BOTTOM:  {
+      QPoint outer = QPoint (corners[1][0].center ().x (), corners[1][0].top ());
+      painter->drawLine (outer, corners[1][0].center ());
+      QPainterPath arrowPointPath;
+      QPolygonF arrowPoint;
+      QPointF tri = corners[1][0].center ();
+      tri.rx () += 10;
+      arrowPoint << tri;
+      tri.rx () -= 20;
+      arrowPoint << tri;
+      tri.rx () += 10;
+      tri.ry () += 17;
+      arrowPoint << tri;
+      arrowPointPath.addPolygon (arrowPoint);
+      painter->fillPath (arrowPointPath, Qt::white);
+      break;
+    }
+    
+    case D_RIGHT:  {
+      QPoint outer = QPoint (corners[2][1].right (), corners[2][1].center ().y ());
+      painter->drawLine (outer, corners[2][1].center ());
+      QPainterPath arrowPointPath;
+      QPolygonF arrowPoint;
+      QPointF tri = corners[2][1].center ();
+      tri.ry () += 10;
+      arrowPoint << tri;
+      tri.ry () -= 20;
+      arrowPoint << tri;
+      tri.ry () += 10;
+      tri.rx () -= 17;
+      arrowPoint << tri;
+      arrowPointPath.addPolygon (arrowPoint);
+      painter->fillPath (arrowPointPath, Qt::white);
+      break;
+    }
+    
+    case D_LEFT:  {
+      QPoint outer = QPoint (corners[0][1].left (), corners[0][1].center ().y ());
+      painter->drawLine (outer, corners[0][1].center ());
+      QPainterPath arrowPointPath;
+      QPolygonF arrowPoint;
+      QPointF tri = corners[0][1].center ();
+      tri.ry () += 10;
+      arrowPoint << tri;
+      tri.ry () -= 20;
+      arrowPoint << tri;
+      tri.ry () += 10;
+      tri.rx () += 17;
+      arrowPoint << tri;
+      arrowPointPath.addPolygon (arrowPoint);
+      painter->fillPath (arrowPointPath, Qt::white);
+      break;
+    }
+  }
 }
 
 bool QMazeWindow::move (int direction)
@@ -143,24 +257,28 @@ bool QMazeWindow::move (int direction)
       case D_TOP:  {
         pos.coord.y++;
         myPosition = pos.id;
+        cameFrom = (uint8_t) D_BOTTOM;
         break;
       }
       
       case D_RIGHT:  {
         pos.coord.x++;
         myPosition = pos.id;
+        cameFrom = (uint8_t) D_LEFT;
         break;
       }
       
       case D_BOTTOM:  {
         pos.coord.y--;
         myPosition = pos.id;
+        cameFrom = (uint8_t) D_TOP;
         break;
       }
       
       case D_LEFT:  {
         pos.coord.x--;
         myPosition = pos.id;
+        cameFrom = (uint8_t) D_RIGHT;
         break;
       }
     }
@@ -224,11 +342,13 @@ void QMazeWindow::keyPressEvent (QKeyEvent *event)
     case 16777220:  {
       if (myPosition == the_maze->getFinish ().id)  {
         delete the_maze;
-        if (myLevel < 5)  {
+        if (myLevel < (COUNT_LEVEL - 1))  {
           myLevel++;
         }
+        complMazes++;
         the_maze = new Maze (level[myLevel], level[myLevel - 1]);
         myPosition = the_maze->getStart ().id;
+        cameFrom = 16;
         repaint ();
       }
       break;
