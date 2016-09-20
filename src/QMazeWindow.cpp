@@ -141,18 +141,18 @@ void QMazeWindow::drawCell (Maze *maze, QPainter *painter)
   /* Draw info box. */
   QRect infoBox;
   infoBox.setWidth (210);
-  infoBox.setHeight (260);
+  infoBox.setHeight (130);
   infoBox.moveTopRight (rect ().topRight ());
   QPen infoBoxStyle (Qt::white, 2, Qt::DashDotLine);
   painter->fillRect (infoBox, Qt::black);
   QPoint ctr = infoBox.center ();
   infoBox.setWidth (200);
-  infoBox.setHeight (250);
+  infoBox.setHeight (120);
   infoBox.moveCenter (ctr);
   painter->setPen (infoBoxStyle);
   painter->drawRect (infoBox);
   
-  QRect infoText = QRect (0, 0, infoBox.width () - 10, 50);
+  QRect infoText = QRect (0, 0, infoBox.width () - 10, 20);
   infoText.moveTopRight (infoBox.topRight ());
   painter->drawText (infoText, Qt::AlignLeft, tr ("Level: %1").arg (myLevel));
   infoText.moveTop (infoText.bottom ());
