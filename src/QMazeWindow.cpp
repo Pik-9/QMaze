@@ -6,7 +6,7 @@
 #include <QPaintEvent>
 #include <QKeyEvent>
 
-const uint32_t QMazeWindow::level[COUNT_LEVEL] = {5, 7, 11, 13, 17, 23, 27};
+const uint32_t QMazeWindow::level[COUNT_LEVEL] = {5, 7, 11, 13, 17, 19, 23, 29};
 
 QMazeWindow::QMazeWindow ()
   : QMainWindow ()

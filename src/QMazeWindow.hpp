@@ -1,7 +1,7 @@
 #ifndef QMemory_H
 #define QMemory_H
 
-#define COUNT_LEVEL 7
+#define COUNT_LEVEL 8
 
 #include <QMainWindow>
 
