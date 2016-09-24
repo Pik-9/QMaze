@@ -26,6 +26,46 @@ QMazeWindow::~QMazeWindow ()
   delete the_maze;
 }
 
+void QMazeWindow::drawFinish (QRect finRect, QPainter *painter)
+{
+  QFont original = painter->font ();
+  QFont finFont = original;
+  finFont.setPointSize (30);
+  painter->fillRect (finRect, Qt::black);
+  QRect flag[6][4];
+  const uint32_t fw = finRect.width () / 6;
+  const uint32_t fh = finRect.height () / 4;
+  for (uint32_t iw = 0; iw < 6; iw++)  {
+    for (uint32_t ih = 0; ih < 4; ih++)  {
+      flag[iw][ih] = QRect (iw * fw + finRect.left (), ih * fh + finRect.top (), fw, fh);
+    }
+  }
+  
+  for (uint32_t ih = 0; ih < 4; ih++)  {
+    for (uint32_t iw = (ih % 2); iw < 6; iw += 2)  {
+      painter->fillRect (flag[iw][ih], Qt::white);
+    }
+  }
+  
+  QRect titleRect (flag[0][0].topLeft (), flag[5][2].bottomRight ());
+  QRect descRect (flag[0][3].topLeft (), flag[5][3].bottomRight ());
+  QString title = tr ("Finish");
+  QString desc = tr ("Press [Enter] to get to the next level!");
+  painter->setPen (QColor (255, 128, 0));
+  painter->setFont (finFont);
+  QFontMetrics titleFM (finFont);
+  QRect titleBound = titleFM.boundingRect (titleRect, Qt::AlignCenter, title);
+  painter->fillRect (titleBound, Qt::black);
+  painter->drawRect (titleBound);
+  painter->drawText (titleRect, Qt::AlignCenter, title);
+  painter->setFont (original);
+  QFontMetrics descFM (original);
+  QRect descBound = descFM.boundingRect (descRect, Qt::AlignCenter, desc);
+  painter->fillRect (descBound, Qt::black);
+  painter->drawRect (descBound);
+  painter->drawText (descRect, Qt::AlignCenter, desc);
+}
+
 void QMazeWindow::drawMaze (Maze *maze, QPainter *painter)
 {
   QRect cells[maze->get_x ()][maze->get_y ()];
@@ -90,7 +130,7 @@ void QMazeWindow::drawCell (Maze *maze, QPainter *painter)
   QColor colors[8] = {
     Qt::red,
     Qt::magenta,
-    Qt::blue,
+    QColor (32, 64, 255),
     Qt::cyan,
     Qt::green,
     Qt::yellow,
@@ -131,11 +171,25 @@ void QMazeWindow::drawCell (Maze *maze, QPainter *painter)
   
   painter->setPen (col);
   if (myPosition == maze->getStart ().id)  {
-    painter->drawText (corners[1][1], Qt::AlignCenter, tr ("Start"));
+    QFont original = painter->font ();
+    QFont startFont = original;
+    startFont.setPointSize (30);
+    QFontMetrics startFM (startFont);
+    QString start = tr ("Start");
+    QRect startBound = startFM.boundingRect (corners[1][1], Qt::AlignCenter, start);
+    painter->fillRect (startBound, QColor (0, 128, 255));
+    painter->setFont (startFont);
+    painter->setPen (Qt::black);
+    painter->drawText (corners[1][1], Qt::AlignCenter, start);
+    QRect outerStartBound (0, 0, startBound.width () + 10, startBound.height () + 10);
+    outerStartBound.moveCenter (startBound.center ());
+    painter->setPen (QPen (QColor (0, 128, 255), 2));
+    painter->drawRect (outerStartBound);
+    painter->setFont (original);
   }
   
   if (myPosition == maze->getFinish ().id)  {
-    painter->drawText (corners[1][1], Qt::AlignCenter, tr ("Finish - Press [Enter] to get to the next level!"));
+    drawFinish (corners[1][1], painter);
   }
   
   /* Draw info box. */
@@ -143,7 +197,7 @@ void QMazeWindow::drawCell (Maze *maze, QPainter *painter)
   infoBox.setWidth (210);
   infoBox.setHeight (130);
   infoBox.moveTopRight (rect ().topRight ());
-  QPen infoBoxStyle (Qt::white, 2, Qt::DashDotLine);
+  QPen infoBoxStyle (Qt::white, 1, Qt::DashDotLine);
   painter->fillRect (infoBox, Qt::black);
   QPoint ctr = infoBox.center ();
   infoBox.setWidth (200);

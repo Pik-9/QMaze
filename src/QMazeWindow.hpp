@@ -27,6 +27,7 @@ public:
   QMazeWindow ();
   virtual ~QMazeWindow ();
   
+  void drawFinish (QRect, QPainter*);
   void drawMaze (Maze*, QPainter*);
   void drawCell (Maze*, QPainter*);
   bool move (int);
