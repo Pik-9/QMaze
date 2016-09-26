@@ -10,9 +10,10 @@ set(QMemory_SRCS
 )
 
 set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-add_executable(${PROJECT_NAME} ${QMemory_SRCS})
+add_executable(${PROJECT_NAME} ${QMemory_SRCS} Cliparts.qrc)
 target_link_libraries(${PROJECT_NAME} Qt5::Widgets)
 
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)

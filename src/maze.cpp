@@ -2,6 +2,7 @@
 #include "random.hpp"
 
 #include <stack>
+#include <stdlib.h>
 
 Cell::Cell ()
 {
@@ -95,6 +96,11 @@ CellID Maze::getStart () const
 CellID Maze::getFinish () const
 {
   return finish;
+}
+
+CellID Maze::getKeyField () const
+{
+  return key;
 }
 
 Cell& Maze::cellAt (const uint16_t x, const uint16_t y)
@@ -209,4 +215,11 @@ void Maze::generate ()
     }
   }
   finish = current;
+  
+  do  {
+    uint32_t kfield = rr.getNumber (0, x_cells * y_cells - 1);
+    div_t dv = div (kfield, x_cells);
+    key.coord.x = dv.rem + 1;
+    key.coord.y = dv.quot + 1;
+  } while ((key.id == start.id) || (key.id == finish.id));
 }

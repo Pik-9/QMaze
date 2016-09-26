@@ -1,0 +1,5 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+  <file alias="Key0.png">res/Key_unused.png</file>
+  <file alias="Key1.png">res/Key_used.png</file>
+</qresource></RCC>

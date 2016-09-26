@@ -19,7 +19,7 @@ private:
   Maze *the_maze;
   uint32_t myPosition, myLevel, complMazes;
   uint8_t cameFrom;
-  bool fullMaze;
+  bool fullMaze, haveKey;
   
   const static uint32_t level[COUNT_LEVEL];
 

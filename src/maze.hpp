@@ -43,7 +43,7 @@ class Maze
 private:
   uint16_t x_cells, y_cells;
   Cell *cells;
-  CellID start, finish;
+  CellID start, finish, key;
   
 protected:
   void refresh ();
@@ -64,6 +64,7 @@ public:
   uint16_t get_y () const;
   CellID getStart () const;
   CellID getFinish () const;
+  CellID getKeyField () const;
   
   Cell& cellAt (const uint16_t, const uint16_t);
   Cell& cellAt (const CellID);
