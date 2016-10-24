@@ -1,0 +1,4 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+  <file alias="trans_de">@CMAKE_CURRENT_BINARY_DIR@/QMaze_de.qm</file>
+</qresource></RCC>
