@@ -2,4 +2,5 @@
 <qresource>
   <file alias="Key0.png">res/Key_unused.png</file>
   <file alias="Key1.png">res/Key_used.png</file>
+  <file alias="Icon.png">res/Icon.png</file>
 </qresource></RCC>

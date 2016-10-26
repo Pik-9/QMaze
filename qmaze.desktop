@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Exec=qmaze %u
+Icon=/usr/share/QMaze/Icon.png
+Name=QMaze
+Comment=A simple maze game
+Categories=Qt;Game;

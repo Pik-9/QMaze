@@ -32,6 +32,7 @@ const uint32_t QMazeWindow::level[COUNT_LEVEL] = {5, 7, 11, 13, 17, 19, 23, 29};
 QMazeWindow::QMazeWindow ()
   : QMainWindow ()
 {
+  setWindowIcon (QIcon (":/Icon.png"));
   setCursor (Qt::BlankCursor);
   fullMaze = haveKey = false;
   myLevel = 1;
