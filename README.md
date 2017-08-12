@@ -11,9 +11,9 @@ Then you can run:
 `cd /path/to/QMaze`
 `mkdir build && cd build`
 If you want to create a package of *QMaze* you can type:
-`cmake -DDEB_PKG ..`
+`cmake -DDEB_PKG=ON ..`
 for a **deb** package, or:
-`cmake -DRPM_PKG ..`
+`cmake -DRPM_PKG=ON ..`
 for a (OpenSUSE) **rpm** package. If you don't need a package, just type:
 `cmake ..`
 And finally:
