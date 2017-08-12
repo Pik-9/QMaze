@@ -1,28 +1,27 @@
-QMaze
-=====
-
+# QMaze #
 QMaze is a simple maze game. It creates mazes the player has to pass.
 In order to complete a level the player needs to find a key first.
 
 
-Build
------
-
+## Build ##
 To build QMaze you need the following prerequisites (Ubuntu):
 cmake, build-essential qt5-default, qttools5-dev-tools
 
 Then you can run:
-  $ cd /path/to/QMaze
-  $ mkdir build && cd build
-  $ cmake ..
-  $ make package
-
+`cd /path/to/QMaze`
+`mkdir build && cd build`
+If you want to create a package of *QMaze* you can type:
+`cmake -DDEB_PKG ..`
+for a **deb** package, or:
+`cmake -DRPM_PKG ..`
+for a (OpenSUSE) **rpm** package. If you don't need a package, just type:
+`cmake ..`
+And finally:
+`make package`
 You will find a deb package in your build folder then. Just install it.
 
 
-License
--------
-
+## License ##
 Copyright 2016 Daniel Steinhauer
 
 QMaze is free software: you can redistribute it and/or modify
