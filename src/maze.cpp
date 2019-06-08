@@ -20,10 +20,12 @@
  ******************************************************************************/
 
 #include "maze.hpp"
-#include "random.hpp"
 
 #include <stack>
 #include <stdlib.h>
+
+std::random_device Maze::rdevice;
+std::mt19937 Maze::mt_engine (Maze::rdevice ());
 
 Cell::Cell ()
 {
@@ -71,6 +73,17 @@ Maze::Maze (const uint16_t x, const uint16_t y)
 Maze::~Maze ()
 {
   delete[] cells;
+}
+
+int32_t Maze::getRandomNr (const int32_t lb, const int32_t ub)
+{
+  if (lb == ub)  {
+    return lb;
+  }
+
+  return (ub > lb ?
+    (Maze::mt_engine () % (ub - lb) + lb) :
+    (Maze::mt_engine () % (lb - ub) + ub));
 }
 
 void Maze::refresh ()
@@ -212,16 +225,15 @@ std::vector<CellID> Maze::getUnvisitedNeighbors (CellID id)
 void Maze::generate ()
 {
   std::stack<uint32_t> cs;
-  Random rr;
   
-  start.coord.x = rr.getNumber (1, x_cells);
-  start.coord.y = rr.getNumber (1, y_cells);
+  start.coord.x = getRandomNr (1, x_cells);
+  start.coord.y = getRandomNr (1, y_cells);
   CellID current = start;
   cellAt (current).walls |= 16;
   while (countUnvisited ())  {
     std::vector<CellID> ns = getUnvisitedNeighbors (current);
     if (ns.size ())  {
-      CellID next = ns[rr.getNumber (0, ns.size () - 1)];
+      CellID next = ns[getRandomNr (0, ns.size ())];
       cs.push (current.id);
       connectCells (current, next);
       current = next;
@@ -238,7 +250,7 @@ void Maze::generate ()
   finish = current;
   
   do  {
-    uint32_t kfield = rr.getNumber (0, x_cells * y_cells - 1);
+    uint32_t kfield = getRandomNr (0, x_cells * y_cells);
     div_t dv = div (kfield, x_cells);
     key.coord.x = dv.rem + 1;
     key.coord.y = dv.quot + 1;

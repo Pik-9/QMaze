@@ -25,6 +25,7 @@
 #include <stdint.h>
 #include <vector>
 #include <exception>
+#include <random>
 
 union CellID
 {
@@ -62,9 +63,12 @@ class ECellOutOfMaze : public std::exception {};
 class Maze
 {
 private:
-  uint16_t x_cells, y_cells;
+  const uint16_t x_cells, y_cells;
   Cell *cells;
   CellID start, finish, key;
+
+  static std::random_device rdevice;
+  static std::mt19937 mt_engine;
   
 protected:
   void refresh ();
@@ -78,6 +82,8 @@ protected:
 public:
   Maze (const uint16_t, const uint16_t);
   virtual ~Maze ();
+
+  static int32_t getRandomNr (const int32_t, const int32_t);
   
   bool canGo (const CellID, const Direction);
   

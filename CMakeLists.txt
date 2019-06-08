@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.1)
 project(qmaze)
 
 find_package(Qt5Widgets REQUIRED)
@@ -7,7 +7,6 @@ find_package(Qt5LinguistTools)
 set(QMaze_SRCS
   src/QMazeWindow.cpp
   src/maze.cpp
-  src/random.cpp
   src/main.cpp
 )
 
@@ -18,6 +17,7 @@ set(QMaze_Lang
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_CXX_STANDARD 14)
 
 option(DEP_PKG OFF)
 option(RPM_PKG OFF)

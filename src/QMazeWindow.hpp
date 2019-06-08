@@ -27,6 +27,7 @@
 #include <QMainWindow>
 
 #include <stdint.h>
+#include <memory>
 
 class QKeyEvent;
 class Maze;
@@ -37,7 +38,7 @@ class QMazeWindow : public QMainWindow
 {
   Q_OBJECT
 private:
-  Maze *the_maze;
+  std::unique_ptr<Maze> the_maze;
   uint32_t myPosition, myLevel, complMazes;
   uint8_t cameFrom;
   bool fullMaze, haveKey;
@@ -49,8 +50,8 @@ public:
   virtual ~QMazeWindow ();
   
   void drawFinish (QRect, QPainter*);
-  void drawMaze (Maze*, QPainter*);
-  void drawCell (Maze*, QPainter*);
+  void drawMaze (QPainter*);
+  void drawCell (QPainter*);
   bool move (int);
   
 protected:

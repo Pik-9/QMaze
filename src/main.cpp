@@ -32,6 +32,6 @@ int main (int argc, char *argv[])
   QLocale loc;
   trans.load (QString (":/trans_%1").arg (loc.name ()));
   app.installTranslator (&trans);
-  QMazeWindow *mwin = new QMazeWindow ();
+  QMazeWindow mwin;
   return app.exec ();
 }
