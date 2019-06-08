@@ -25,7 +25,6 @@
 #include <stdint.h>
 #include <vector>
 #include <exception>
-#include <random>
 
 union CellID
 {
@@ -48,11 +47,11 @@ struct Cell
 {
   CellID id;
   uint8_t walls;
-  
+
   Cell ();
-  
+
   bool visited ();
-  
+
   void setWall (Direction);
   void unsetWall (Direction);
   bool isWallSet (Direction);
@@ -64,35 +63,32 @@ class Maze
 {
 private:
   const uint16_t x_cells, y_cells;
-  Cell *cells;
+  std::vector<Cell> cells;
   CellID start, finish, key;
 
-  static std::random_device rdevice;
-  static std::mt19937 mt_engine;
-  
 protected:
   void refresh ();
-  
+
   uint32_t countUnvisited ();
   void connectCells (CellID, CellID);
   std::vector<CellID> getUnvisitedNeighbors (CellID);
-  
+
   void generate ();
-  
+
 public:
   Maze (const uint16_t, const uint16_t);
   virtual ~Maze ();
 
   static int32_t getRandomNr (const int32_t, const int32_t);
-  
+
   bool canGo (const CellID, const Direction);
-  
+
   uint16_t get_x () const;
   uint16_t get_y () const;
   CellID getStart () const;
   CellID getFinish () const;
   CellID getKeyField () const;
-  
+
   Cell& cellAt (const uint16_t, const uint16_t);
   Cell& cellAt (const CellID);
 };

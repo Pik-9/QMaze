@@ -42,18 +42,18 @@ private:
   uint32_t myPosition, myLevel, complMazes;
   uint8_t cameFrom;
   bool fullMaze, haveKey;
-  
+
   const static uint32_t level[COUNT_LEVEL];
 
 public:
   QMazeWindow ();
   virtual ~QMazeWindow ();
-  
+
   void drawFinish (QRect, QPainter*);
   void drawMaze (QPainter*);
   void drawCell (QPainter*);
   bool move (int);
-  
+
 protected:
   void keyPressEvent (QKeyEvent*);
   void paintEvent (QPaintEvent*);

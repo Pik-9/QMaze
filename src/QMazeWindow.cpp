@@ -60,13 +60,13 @@ void QMazeWindow::drawFinish (QRect finRect, QPainter *painter)
       flag[iw][ih] = QRect (iw * fw + finRect.left (), ih * fh + finRect.top (), fw, fh);
     }
   }
-  
+
   for (uint32_t ih = 0; ih < 4; ih++)  {
     for (uint32_t iw = (ih % 2); iw < 6; iw += 2)  {
       painter->fillRect (flag[iw][ih], Qt::white);
     }
   }
-  
+
   if (haveKey)  {
     QRect titleRect (flag[0][0].topLeft (), flag[5][2].bottomRight ());
     QRect descRect (flag[0][3].topLeft (), flag[5][3].bottomRight ());
@@ -93,15 +93,15 @@ void QMazeWindow::drawMaze (QPainter *painter)
   QRect cells[the_maze->get_x ()][the_maze->get_y ()];
   const int wd = width () / the_maze->get_x ();
   const int ht = height () / the_maze->get_y ();
-  
+
   painter->fillRect (rect (), Qt::black);
   painter->setPen (Qt::white);
-  
+
   for (int ix = 0; ix < the_maze->get_x (); ++ix)  {
     for (int iy = 0; iy < the_maze->get_y (); ++iy)  {
       cells[ix][iy] = QRect (wd * ix, ht * iy, wd, ht);
       Cell& cll = the_maze->cellAt (ix + 1, iy + 1);
-      
+
       QFont textFont = painter->font ();
       textFont.setPointSize (30);
       painter->setFont (textFont);
@@ -116,7 +116,7 @@ void QMazeWindow::drawMaze (QPainter *painter)
       if (cll.id.id == the_maze->getKeyField ().id)  {
         painter->drawImage (cells[ix][iy], (haveKey ? QImage (":/Key1.png") : QImage (":/Key0.png")));
       }
-      
+
       painter->setPen (Qt::white);
       if (cll.isWallSet (D_BOTTOM))  {
         painter->drawLine (cells[ix][iy].topLeft (), cells[ix][iy].topRight ());
@@ -132,7 +132,7 @@ void QMazeWindow::drawMaze (QPainter *painter)
       }
     }
   }
-  
+
   QPainterPath path;
   QRectF bounding;
   CellID pos;
@@ -149,9 +149,9 @@ void QMazeWindow::drawCell (QPainter *painter)
   QRect corners[3][3];
   const int wd = width () / 3;
   const int ht = height () / 3;
-  
+
   painter->fillRect (rect (), Qt::black);
-  
+
   QColor colors[8] = {
     Qt::red,
     Qt::magenta,
@@ -162,38 +162,38 @@ void QMazeWindow::drawCell (QPainter *painter)
     Qt::white,
     Qt::white
   };
-  
+
   CellID pos;
   pos.id = myPosition;
   QColor col = colors[the_maze->cellAt (pos).walls >> 5];
-  
+
   for (int ix = 0; ix < 3; ++ix)  {
     for (int iy = 0; iy < 3; ++iy)  {
       corners[ix][iy] = QRect (wd * ix, ht * iy, wd, ht);
     }
   }
-  
+
   painter->fillRect (corners[0][0], col);
   painter->fillRect (corners[0][2], col);
   painter->fillRect (corners[2][0], col);
   painter->fillRect (corners[2][2], col);
-  
+
   if (the_maze->cellAt (pos).isWallSet (D_RIGHT))  {
     painter->fillRect (corners[2][1], col);
   }
-  
+
   if (the_maze->cellAt (pos).isWallSet (D_LEFT))  {
     painter->fillRect (corners[0][1], col);
   }
-  
+
   if (the_maze->cellAt (pos).isWallSet (D_TOP))  {
     painter->fillRect (corners[1][2], col);
   }
-  
+
   if (the_maze->cellAt (pos).isWallSet (D_BOTTOM))  {
     painter->fillRect (corners[1][0], col);
   }
-  
+
   painter->setPen (col);
   if (myPosition == the_maze->getStart ().id)  {
     QFont original = painter->font ();
@@ -212,11 +212,11 @@ void QMazeWindow::drawCell (QPainter *painter)
     painter->drawRect (outerStartBound);
     painter->setFont (original);
   }
-  
+
   if (myPosition == the_maze->getFinish ().id)  {
     drawFinish (corners[1][1], painter);
   }
-  
+
   /* Draw info box. */
   QRect infoBox;
   infoBox.setWidth (210);
@@ -230,7 +230,7 @@ void QMazeWindow::drawCell (QPainter *painter)
   infoBox.moveCenter (ctr);
   painter->setPen (infoBoxStyle);
   painter->drawRect (infoBox);
-  
+
   QRect infoText = QRect (0, 0, infoBox.width () - 10, 20);
   infoText.moveTopRight (infoBox.topRight ());
   painter->drawText (infoText, Qt::AlignLeft, tr ("Level: %1").arg (myLevel));
@@ -247,8 +247,8 @@ void QMazeWindow::drawCell (QPainter *painter)
   painter->drawText (infoText, Qt::AlignLeft, tr ("[F]: Show maze map"));
   infoText.moveTop (infoText.bottom ());
   painter->drawText (infoText, Qt::AlignLeft, tr ("[C]: Show current cell"));  
-  
-  
+
+
   /* Draw arrow. */
   QPen arrow_style (Qt::white, 5);
   painter->setPen (arrow_style);
@@ -271,7 +271,7 @@ void QMazeWindow::drawCell (QPainter *painter)
       painter->fillPath (arrowPointPath, Qt::white);
       break;
     }
-    
+
     case D_BOTTOM:  {
       QPoint outer = QPoint (corners[1][0].center ().x (), corners[1][0].top ());
       painter->drawLine (outer, corners[1][0].center ());
@@ -289,7 +289,7 @@ void QMazeWindow::drawCell (QPainter *painter)
       painter->fillPath (arrowPointPath, Qt::white);
       break;
     }
-    
+
     case D_RIGHT:  {
       QPoint outer = QPoint (corners[2][1].right (), corners[2][1].center ().y ());
       painter->drawLine (outer, corners[2][1].center ());
@@ -307,7 +307,7 @@ void QMazeWindow::drawCell (QPainter *painter)
       painter->fillPath (arrowPointPath, Qt::white);
       break;
     }
-    
+
     case D_LEFT:  {
       QPoint outer = QPoint (corners[0][1].left (), corners[0][1].center ().y ());
       painter->drawLine (outer, corners[0][1].center ());
@@ -326,7 +326,7 @@ void QMazeWindow::drawCell (QPainter *painter)
       break;
     }
   }
-  
+
   if (myPosition == the_maze->getKeyField ().id)  {
     painter->drawImage (corners[1][1], QImage (":/Key0.png"));
   }
@@ -338,7 +338,7 @@ bool QMazeWindow::move (int direction)
   Direction dir = (Direction) direction;
   CellID pos;
   pos.id = myPosition;
-  
+
   if (the_maze->canGo (pos, dir))  {
     RET = true;
     switch (dir)  {
@@ -348,21 +348,21 @@ bool QMazeWindow::move (int direction)
         cameFrom = (uint8_t) D_BOTTOM;
         break;
       }
-      
+
       case D_RIGHT:  {
         pos.coord.x++;
         myPosition = pos.id;
         cameFrom = (uint8_t) D_LEFT;
         break;
       }
-      
+
       case D_BOTTOM:  {
         pos.coord.y--;
         myPosition = pos.id;
         cameFrom = (uint8_t) D_TOP;
         break;
       }
-      
+
       case D_LEFT:  {
         pos.coord.x--;
         myPosition = pos.id;
@@ -371,13 +371,13 @@ bool QMazeWindow::move (int direction)
       }
     }
   }
-  
+
   if (myPosition == the_maze->getKeyField ().id)  {
     haveKey = true;
   }
-  
+
   repaint ();
-  
+
   return RET;
 }
 
@@ -392,45 +392,45 @@ void QMazeWindow::keyPressEvent (QKeyEvent *event)
       qApp->quit ();
       break;
     }
-    
+
     /* Pressed [Up] - Pretend to be [Down]: */
     case 16777235:  {
       move ((int) D_BOTTOM);
       break;
     }
-    
+
     /* Pressed [Down] - Pretend to be [Up]. */
     case 16777237:  {
       move ((int) D_TOP);
       break;
     }
-    
+
     /* Pressed [Right]. */
     case 16777236:  {
       move ((int) D_RIGHT);
       break;
     }
-    
+
     /* Pressed [Left]. */
     case 16777234:  {
       move ((int) D_LEFT);
       break;
     }
-    
+
     /* Pressed [F]. */
     case 70:  {
       fullMaze = true;
       repaint ();
       break;
     }
-    
+
     /* Pressed [C]. */
     case 67:  {
       fullMaze = false;
       repaint ();
       break;
     }
-    
+
     /* Pressed [Enter]. */
     case 16777220:  {
       if ((myPosition == the_maze->getFinish ().id) && (haveKey))  {

@@ -22,10 +22,8 @@
 #include "maze.hpp"
 
 #include <stack>
+#include <random>
 #include <stdlib.h>
-
-std::random_device Maze::rdevice;
-std::mt19937 Maze::mt_engine (Maze::rdevice ());
 
 Cell::Cell ()
 {
@@ -57,7 +55,7 @@ bool Cell::isWallSet (Direction dir)
 Maze::Maze (const uint16_t x, const uint16_t y)
   : x_cells (x), y_cells (y)
 {
-  cells = new Cell[x * y];
+  cells.resize (x * y);
   uint8_t color = 0;
   for (uint16_t ix = 1; ix <= x; ++ix)  {
     for (uint16_t iy = 1; iy <= y; ++iy)  {
@@ -66,29 +64,29 @@ Maze::Maze (const uint16_t x, const uint16_t y)
       cellAt (ix, iy).walls |= ((color++ % 6) << 5);
     }
   }
-  
+
   generate ();
 }
 
 Maze::~Maze ()
-{
-  delete[] cells;
-}
+{}
 
 int32_t Maze::getRandomNr (const int32_t lb, const int32_t ub)
 {
+  static std::random_device rdevice;
+  static std::mt19937 mt_engine (rdevice ());
+
   if (lb == ub)  {
     return lb;
   }
 
   return (ub > lb ?
-    (Maze::mt_engine () % (ub - lb) + lb) :
-    (Maze::mt_engine () % (lb - ub) + ub));
+    (mt_engine () % (ub - lb) + lb) :
+    (mt_engine () % (lb - ub) + ub));
 }
 
 void Maze::refresh ()
 {
-  
 }
 
 bool Maze::canGo (const CellID field, const Direction dir)
@@ -96,19 +94,19 @@ bool Maze::canGo (const CellID field, const Direction dir)
   if ((dir == D_TOP)  && (field.coord.y >= y_cells))  {
     return false;
   }
-  
+
   if ((dir == D_RIGHT)  && (field.coord.x >= x_cells))  {
     return false;
   }
-  
+
   if ((dir == D_BOTTOM)  && (field.coord.y == 0))  {
     return false;
   }
-  
+
   if ((dir == D_LEFT)  && (field.coord.x == 0))  {
     return false;
   }
-  
+
   return (!cellAt (field).isWallSet (dir));
 }
 
@@ -158,7 +156,7 @@ uint32_t Maze::countUnvisited ()
       RET++;
     }
   }
-  
+
   return RET;
 }
 
@@ -166,7 +164,7 @@ void Maze::connectCells (CellID a, CellID b)
 {
   int32_t diff_x = a.coord.x - b.coord.x;
   int32_t diff_y = a.coord.y - b.coord.y;
-  
+
   if ((diff_x == 0) && (diff_y == 1))  {
     cellAt (a).unsetWall (D_BOTTOM);
     cellAt (b).unsetWall (D_TOP);
@@ -186,7 +184,7 @@ std::vector<CellID> Maze::getUnvisitedNeighbors (CellID id)
 {
   std::vector<CellID> RET;
   CellID tmp = id;
-  
+
   if (id.coord.x > 1)  {
     tmp.coord.x--;
     if (!cellAt (tmp).visited ())  {
@@ -194,7 +192,7 @@ std::vector<CellID> Maze::getUnvisitedNeighbors (CellID id)
     }
     tmp.coord.x++;
   }
-  
+
   if (id.coord.x < x_cells)  {
     tmp.coord.x++;
     if (!cellAt (tmp).visited ())  {
@@ -202,7 +200,7 @@ std::vector<CellID> Maze::getUnvisitedNeighbors (CellID id)
     }
     tmp.coord.x--;
   }
-  
+
   if (id.coord.y > 1)  {
     tmp.coord.y--;
     if (!cellAt (tmp).visited ())  {
@@ -210,7 +208,7 @@ std::vector<CellID> Maze::getUnvisitedNeighbors (CellID id)
     }
     tmp.coord.y++;
   }
-  
+
   if (id.coord.y < y_cells)  {
     tmp.coord.y++;
     if (!cellAt (tmp).visited ())  {
@@ -218,14 +216,14 @@ std::vector<CellID> Maze::getUnvisitedNeighbors (CellID id)
     }
     tmp.coord.y--;
   }
-  
+
   return RET;
 }
 
 void Maze::generate ()
 {
   std::stack<uint32_t> cs;
-  
+
   start.coord.x = getRandomNr (1, x_cells);
   start.coord.y = getRandomNr (1, y_cells);
   CellID current = start;
@@ -248,7 +246,7 @@ void Maze::generate ()
     }
   }
   finish = current;
-  
+
   do  {
     uint32_t kfield = getRandomNr (0, x_cells * y_cells);
     div_t dv = div (kfield, x_cells);
