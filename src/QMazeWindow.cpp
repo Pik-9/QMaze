@@ -117,7 +117,9 @@ void QMazeWindow::drawMaze (QPainter *painter)
         painter->drawImage (cells[ix][iy], (haveKey ? QImage (":/Key1.png") : QImage (":/Key0.png")));
       }
 
-      painter->setPen (Qt::white);
+      QPen wallPen (Qt::white);
+      wallPen.setWidth (4);
+      painter->setPen (wallPen);
       if (cll.isWallSet (D_BOTTOM))  {
         painter->drawLine (cells[ix][iy].topLeft (), cells[ix][iy].topRight ());
       }
